@@ -54,18 +54,21 @@ export function Cursor({ enabled }: { enabled: boolean }) {
     };
   }, [enabled]);
 
-  if (!isVisible || !enabled) return null;
+  if (!enabled) return null;
 
   return (
     <>
       <div 
         ref={ringRef}
-        className="fixed top-0 left-0 w-8 h-8 border border-accent rounded-full pointer-events-none z-[9999] -ml-4 -mt-4 hidden lg:block"
+        className={`fixed top-0 left-0 w-8 h-8 border border-accent rounded-full pointer-events-none z-[9999] -ml-4 -mt-4 lg:block ${isVisible ? '' : 'hidden'}`}
+        suppressHydrationWarning
       />
       <div 
         ref={dotRef}
-        className="fixed top-0 left-0 w-2 h-2 bg-accent rounded-full pointer-events-none z-[10000] -ml-1 -mt-1 hidden lg:block"
+        className={`fixed top-0 left-0 w-2 h-2 bg-accent rounded-full pointer-events-none z-[10000] -ml-1 -mt-1 lg:block ${isVisible ? '' : 'hidden'}`}
+        suppressHydrationWarning
       />
     </>
   );
 }
+

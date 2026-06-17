@@ -9,6 +9,7 @@ interface EntryWrapperProps {
 }
 
 export function EntryWrapper({ children }: EntryWrapperProps) {
+  const [mounted, setMounted] = useState(false)
   const [startVisible, setStartVisible] = useState(false)
   const [hasEntered, setHasEntered] = useState(false)
   const [isFadingOut, setIsFadingOut] = useState(false)
@@ -20,8 +21,15 @@ export function EntryWrapper({ children }: EntryWrapperProps) {
     }, 1000) // 1 second fade out duration
   }
   
+  // Mount guard — only show entry animation after hydration
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+  
   // Fade in the start button after animation loads and scroll to top
   useEffect(() => {
+    if (!mounted) return
+    
     // Immediately force scroll to top (the Hero section) so when they hit enter, they are at the top
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
 
@@ -40,9 +48,10 @@ export function EntryWrapper({ children }: EntryWrapperProps) {
       clearTimeout(timer)
       document.body.style.overflow = "";
     }
-  }, [hasEntered])
+  }, [mounted, hasEntered])
   
-  if (hasEntered) {
+  // Before hydration or after entering: just render children
+  if (!mounted || hasEntered) {
     return <>{children}</>
   }
 
@@ -91,3 +100,4 @@ export function EntryWrapper({ children }: EntryWrapperProps) {
     </>
   )
 }
+
