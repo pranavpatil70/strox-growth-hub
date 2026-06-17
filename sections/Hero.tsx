@@ -2,6 +2,7 @@
 
 import { content } from "@/content";
 import { useReveal, gsap } from "@/lib/gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -60,7 +61,7 @@ export function Hero() {
     });
 
     const handleResize = () => {
-      gsap.ScrollTrigger.refresh();
+      ScrollTrigger.refresh();
     };
     window.addEventListener("resize", handleResize);
 

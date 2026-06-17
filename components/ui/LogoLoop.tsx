@@ -7,7 +7,7 @@ const ANIMATION_CONFIG = { SMOOTH_TAU: 0.25, MIN_COPIES: 2, COPY_HEADROOM: 2 };
 
 const toCssLength = (value: number | string | undefined) => (typeof value === 'number' ? `${value}px` : (value ?? undefined));
 
-const useResizeObserver = (callback: () => void, elements: React.RefObject<HTMLElement>[], dependencies: any[]) => {
+const useResizeObserver = (callback: () => void, elements: React.RefObject<any>[], dependencies: any[]) => {
   useEffect(() => {
     if (!window.ResizeObserver) {
       const handleResize = () => callback();
@@ -28,7 +28,7 @@ const useResizeObserver = (callback: () => void, elements: React.RefObject<HTMLE
   }, [callback, elements, dependencies]);
 };
 
-const useImageLoader = (seqRef: React.RefObject<HTMLElement>, onLoad: () => void, dependencies: any[]) => {
+const useImageLoader = (seqRef: React.RefObject<any>, onLoad: () => void, dependencies: any[]) => {
   useEffect(() => {
     const images = seqRef.current?.querySelectorAll('img') ?? [];
     if (images.length === 0) {
@@ -40,7 +40,7 @@ const useImageLoader = (seqRef: React.RefObject<HTMLElement>, onLoad: () => void
       remainingImages -= 1;
       if (remainingImages === 0) onLoad();
     };
-    images.forEach(img => {
+    images.forEach((img: any) => {
       const htmlImg = img as HTMLImageElement;
       if (htmlImg.complete) {
         handleImageLoad();
@@ -50,7 +50,7 @@ const useImageLoader = (seqRef: React.RefObject<HTMLElement>, onLoad: () => void
       }
     });
     return () => {
-      images.forEach(img => {
+      images.forEach((img: any) => {
         img.removeEventListener('load', handleImageLoad);
         img.removeEventListener('error', handleImageLoad);
       });
@@ -58,7 +58,7 @@ const useImageLoader = (seqRef: React.RefObject<HTMLElement>, onLoad: () => void
   }, [onLoad, seqRef, dependencies]);
 };
 
-const useAnimationLoop = (trackRef: React.RefObject<HTMLElement>, targetVelocity: number, seqWidth: number, seqHeight: number, isHovered: boolean, hoverSpeed: number | undefined, isVertical: boolean) => {
+const useAnimationLoop = (trackRef: React.RefObject<any>, targetVelocity: number, seqWidth: number, seqHeight: number, isHovered: boolean, hoverSpeed: number | undefined, isVertical: boolean) => {
   const rafRef = useRef<number | null>(null);
   const lastTimestampRef = useRef<number | null>(null);
   const offsetRef = useRef(0);
