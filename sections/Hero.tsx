@@ -85,7 +85,7 @@ export function Hero() {
             
             {/* Desktop image — visible ≥768px */}
             <Image 
-              src="/founders.png"
+              src="/founders3.png"
               alt="Intellobyte Founders"
               fill
               className="hero-bg-image hidden md:block object-cover object-[center_bottom] grayscale will-change-transform"
