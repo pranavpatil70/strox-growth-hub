@@ -18,6 +18,7 @@ export interface Hero {
   sub: string;
   ctas: CTA[];
   image?: string;
+  imageMobile?: string;
 }
 
 export interface ClientLogo { name: string; src?: string } // src optional → styled wordmark fallback
@@ -125,6 +126,7 @@ export const content: SiteContent = {
     headline3: "Works",
     sub: "We don't template. We engineer.",
     image: "/founders3.png",
+    imageMobile: "/founders-mobile.png",
     ctas: [
       { label: "Start a Project", href: "#contact" },
       { label: "See Our Work", href: "#work" },

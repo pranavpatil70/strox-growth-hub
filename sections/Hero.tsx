@@ -1,10 +1,8 @@
 "use client";
 
 import { content } from "@/content";
-import { useReveal, gsap } from "@/lib/gsap";
+import { gsap } from "@/lib/gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 
@@ -13,7 +11,7 @@ export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   
   useEffect(() => {
-    let mm = gsap.matchMedia();
+    const mm = gsap.matchMedia();
 
     mm.add("(prefers-reduced-motion: no-preference)", () => {
       if (!sectionRef.current) return;
@@ -56,8 +54,13 @@ export function Hero() {
     mm.add("(prefers-reduced-motion: reduce)", () => {
       if (!sectionRef.current) return;
       const bgImage = sectionRef.current.querySelector(".hero-bg-image");
-      // Just set the final composed state immediately
+      const headline = sectionRef.current.querySelector(".hero-headline");
+      const topRow = sectionRef.current.querySelector(".hero-top-row");
+      const scrim = sectionRef.current.querySelector(".hero-scrim");
+      // Set the final composed state immediately
       gsap.set(bgImage, { opacity: 0.3 });
+      gsap.set(scrim, { opacity: 1 });
+      gsap.set([headline, topRow], { y: 0, opacity: 1 });
     });
 
     const handleResize = () => {
@@ -74,70 +77,84 @@ export function Hero() {
   return (
     <section ref={sectionRef} className="relative w-full h-[150vh] bg-bg" id="home">
       {/* Sticky container holds the layout while we scroll the wrapper */}
-      <div className="sticky top-0 h-screen w-full flex flex-col justify-start pt-24 md:pt-[100px] pb-16 overflow-hidden">
+      <div className="sticky top-0 min-h-[100svh] h-screen w-full flex flex-col overflow-hidden">
         
-        {/* Full-bleed Background Image */}
+        {/* Full-bleed Background Image with <picture> for responsive loading */}
         {hero.image && (
           <div className="absolute inset-0 z-0 pointer-events-none bg-bg">
             
-            {/* Clean Base Image Layer */}
+            {/* Desktop image — visible ≥768px */}
             <Image 
-              src={hero.image}
+              src="/founders.png"
               alt="Intellobyte Founders"
               fill
-              className="hero-bg-image object-cover object-[75%_bottom] md:object-[center_bottom] grayscale will-change-transform"
+              className="hero-bg-image hidden md:block object-cover object-[center_bottom] grayscale will-change-transform"
               priority
+              sizes="100vw"
+            />
+            {/* Mobile image — visible <768px */}
+            <Image 
+              src="/founders-mobile.png"
+              alt="Intellobyte Founders"
+              fill
+              className="hero-bg-image block md:hidden object-cover object-[center_20%] grayscale will-change-transform"
+              priority
+              sizes="100vw"
             />
             
-            {/* Soft left/bottom gradient scrim for text legibility, hidden on load */}
+            {/* Soft gradient scrim for text legibility, hidden on load */}
             <div className="hero-scrim absolute inset-0 pointer-events-none">
-              <div className="absolute inset-y-0 left-0 w-[100%] md:w-[70%] bg-gradient-to-r from-bg via-bg/80 to-transparent" />
+              {/* Mobile: stronger overall overlay since text sits on top of image */}
+              <div className="absolute inset-0 bg-bg/60 md:bg-transparent" />
+              {/* Desktop: directional gradients */}
+              <div className="hidden md:block absolute inset-y-0 left-0 w-[70%] bg-gradient-to-r from-bg via-bg/80 to-transparent" />
               <div className="absolute bottom-0 inset-x-0 h-[50%] bg-gradient-to-t from-bg via-bg/60 to-transparent" />
               <div className="absolute top-0 inset-x-0 h-[30%] bg-gradient-to-b from-bg/80 to-transparent" />
             </div>
           </div>
         )}
         
-        <div className="relative z-10 w-full max-w-[1600px] mx-auto px-4 md:px-8 flex flex-col text-left mt-0 md:mt-2 h-full">
+        <div className="relative z-10 w-full max-w-[1600px] mx-auto px-4 md:px-8 flex flex-col text-left h-full pt-20 md:pt-[100px] pb-6 md:pb-16">
           
           {/* Top Meta Row */}
-          <div className="hero-top-row w-full flex flex-col md:flex-row justify-between items-start md:items-start mb-16 gap-12 md:gap-0 will-change-transform">
+          <div className="hero-top-row w-full flex flex-col md:flex-row justify-between items-start md:items-start mb-8 md:mb-16 gap-6 md:gap-0 will-change-transform">
             
             {/* Top Left: Pill & Reviews */}
-            <div className="flex flex-col items-start gap-6 md:gap-8 w-full md:w-auto">
-              <div className="flex items-center gap-2 border border-accent/30 rounded-full px-4 py-2 text-accent text-[10px] font-bold uppercase tracking-widest bg-black/20 backdrop-blur-sm">
-                <div className="w-4 h-2 rounded-full border-2 border-accent"></div>
+            <div className="flex flex-col items-start gap-4 md:gap-8 w-full md:w-auto">
+              <div className="flex items-center gap-2 border border-accent/30 rounded-full px-3 py-1.5 md:px-4 md:py-2 text-accent text-[9px] md:text-[10px] font-bold uppercase tracking-widest bg-black/20 backdrop-blur-sm">
+                <div className="w-3 h-1.5 md:w-4 md:h-2 rounded-full border-2 border-accent"></div>
                 {hero.eyebrow.toUpperCase()}
               </div>
               
-              <div className="flex flex-wrap items-center gap-4 font-body uppercase tracking-widest text-text w-full">
-                <div className="flex -space-x-3">
-                  <div className="w-12 h-12 rounded-full bg-surface border-2 border-ink-deep grayscale shadow-lg overflow-hidden relative">
-                    <Image src={hero.rating.avatars[0] || "/placeholder.svg"} fill className="object-cover" alt="Reviewer" />
+              {/* Rating row — wraps cleanly at 375px */}
+              <div className="flex flex-wrap items-center gap-3 md:gap-4 font-body uppercase tracking-widest text-text w-full">
+                <div className="flex -space-x-2 md:-space-x-3 shrink-0">
+                  <div className="w-9 h-9 md:w-12 md:h-12 rounded-full bg-surface border-2 border-ink-deep grayscale shadow-lg overflow-hidden relative">
+                    <Image src={hero.rating.avatars[0] || "/placeholder.svg"} fill sizes="48px" className="object-cover" alt="Reviewer" />
                   </div>
-                  <div className="w-12 h-12 rounded-full bg-surface-2 border-2 border-ink-deep grayscale shadow-lg overflow-hidden relative">
-                    <Image src={hero.rating.avatars[1] || "/placeholder.svg"} fill className="object-cover" alt="Reviewer" />
+                  <div className="w-9 h-9 md:w-12 md:h-12 rounded-full bg-surface-2 border-2 border-ink-deep grayscale shadow-lg overflow-hidden relative">
+                    <Image src={hero.rating.avatars[1] || "/placeholder.svg"} fill sizes="48px" className="object-cover" alt="Reviewer" />
                   </div>
-                  <div className="w-12 h-12 rounded-full bg-surface border-2 border-ink-deep grayscale shadow-lg overflow-hidden relative">
-                    <Image src={hero.rating.avatars[2] || "/placeholder.svg"} fill className="object-cover" alt="Reviewer" />
+                  <div className="w-9 h-9 md:w-12 md:h-12 rounded-full bg-surface border-2 border-ink-deep grayscale shadow-lg overflow-hidden relative">
+                    <Image src={hero.rating.avatars[2] || "/placeholder.svg"} fill sizes="48px" className="object-cover" alt="Reviewer" />
                   </div>
                 </div>
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-2">
-                    <div className="flex gap-[2px] text-white text-[10px]">
+                <div className="flex flex-col gap-0.5 md:gap-1">
+                  <div className="flex items-center gap-1.5 md:gap-2">
+                    <div className="flex gap-[2px] text-white text-[9px] md:text-[10px]">
                       {[...Array(hero.rating.stars)].map((_, i) => <span key={i}>★</span>)}
                     </div>
-                    <span className="text-white font-bold text-sm">{hero.rating.score}/5</span>
+                    <span className="text-white font-bold text-xs md:text-sm">{hero.rating.score}/5</span>
                   </div>
-                  <span className="text-muted text-[10px] font-medium tracking-widest">
+                  <span className="text-muted text-[8px] md:text-[10px] font-medium tracking-widest">
                     {hero.rating.reviews.toUpperCase()}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Top Right: Paragraph */}
-            <div className="flex flex-col items-start md:items-end gap-8 md:text-right md:flex w-full md:w-auto">
+            {/* Top Right: Paragraph (hidden on mobile to save space) */}
+            <div className="hidden md:flex flex-col items-end gap-8 text-right w-auto">
               <p className="max-w-[320px] text-[11px] font-bold uppercase tracking-wider leading-[1.6] text-white/60">
                 {hero.sub.toUpperCase()}
               </p>
@@ -145,8 +162,8 @@ export function Hero() {
           </div>
 
           {/* Massive Headline pushed to bottom */}
-          <h1 className="hero-headline font-display uppercase tracking-[-0.03em] leading-[0.9] text-[clamp(2.5rem,8vw,8rem)] flex flex-col items-start mt-auto pb-8 w-full max-w-[1200px] will-change-transform">
-            <span className="text-transparent" style={{ WebkitTextStroke: '2px white' }}>
+          <h1 className="hero-headline font-display uppercase tracking-[-0.03em] leading-[0.9] text-[clamp(2.2rem,8vw,8rem)] flex flex-col items-start mt-auto pb-4 md:pb-8 w-full max-w-[1200px] will-change-transform">
+            <span className="text-transparent" style={{ WebkitTextStroke: '1.5px white' }}>
               {hero.headline1}
             </span>
             <span className="text-accent mt-[-0.05em]">
@@ -157,8 +174,14 @@ export function Hero() {
             </span>
           </h1>
 
+          {/* Mobile sub-line (shown only on mobile, below headline) */}
+          <p className="md:hidden text-[10px] font-bold uppercase tracking-wider leading-[1.6] text-white/60 pb-4">
+            {hero.sub.toUpperCase()}
+          </p>
+
         </div>
       </div>
     </section>
   );
 }
+
